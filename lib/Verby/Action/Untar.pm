@@ -28,7 +28,7 @@ sub do {
 			chdir $dest;
 
 			$self->tar_archive( $c )->extract
-				or $c->logger->logdie("Archive::Tar->extract did not return a true value");
+				or $c->logger->log_and_die("Archive::Tar->extract did not return a true value");
 
 			exit 0;
 		},
@@ -88,7 +88,7 @@ sub _override_tar_error {
 	my $self = shift;
 	my $c = shift;
 
-	Sub::Override->new("Archive::Tar::_error" => sub { $c->logger->logdie(caller() . ": $_[1]") });
+	Sub::Override->new("Archive::Tar::_error" => sub { $c->logger->log_and_die(caller() . ": $_[1]") });
 }
 
 sub tar_archive {
