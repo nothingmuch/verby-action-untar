@@ -85,8 +85,10 @@ sub tar_archive {
 package Archive::Tar::LogError;
 use base qw(Archive::Tar);
 
+use Log::Dispatch::Config;
+
 sub _error {
-    Log::Dispatch::Config->instance->log_and_die($_[1]);
+    Log::Dispatch::Config->instance->log_and_die( level => "error", message => $_[1] );
 }
 
 __PACKAGE__
