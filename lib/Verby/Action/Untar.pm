@@ -10,7 +10,6 @@ our $VERSION = "0.04";
 use Archive::Tar;
 use File::Spec;
 use File::stat;
-use Sub::Override;
 
 sub do {
 	my ( $self, $c ) = @_;
@@ -23,8 +22,6 @@ sub do {
 	$self->create_poe_session(
 		c       => $c,
 		program => sub {
-			my $o = $self->_override_tar_error($c);
-
 			chdir $dest;
 
 			$self->tar_archive( $c )->extract
@@ -44,8 +41,6 @@ sub finished {
 
 sub verify {
 	my ( $self, $c ) = @_;
-
-	my $o = $self->_override_tar_error($c);
 
 	my $dest = $c->dest;
 
@@ -84,16 +79,16 @@ sub verify {
 	return 1;
 }
 
-sub _override_tar_error {
-	my $self = shift;
-	my $c = shift;
-
-	Sub::Override->new("Archive::Tar::_error" => sub { $c->logger->log_and_die(caller() . ": $_[1]") });
-}
-
 sub tar_archive {
 	my ( $self, $c ) = @_;
-	$c->archive_object || $c->archive_object(Archive::Tar->new($c->tarball));
+	$c->archive_object || $c->archive_object(Archive::Tar::LogError->new($c->tarball));
+}
+
+package Archive::Tar::LogError;
+use base qw(Archive::Tar);
+
+sub _error {
+    Log::Dispatch::Config->instance->log_and_die($_[1]);
 }
 
 __PACKAGE__
