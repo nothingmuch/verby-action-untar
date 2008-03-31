@@ -24,7 +24,7 @@ sub do {
 		program => sub {
 			chdir $dest;
 
-			$self->tar_archive( $c )->extract
+			$self->tar_archive($c)->extract
 				or $c->logger->log_and_die("Archive::Tar->extract did not return a true value");
 
 			exit 0;
