@@ -10,18 +10,16 @@ use Hash::AsObject;
 use File::Temp qw(tempdir);
 use POE;
 
+use Log::Dispatch::Config::TestLog;
+
 use ok 'Verby::Action::Untar';
 
 my $dir = tempdir( CLEANUP => 1 );
 
 my $obj = Verby::Action::Untar->new();
 
-my $logger = Test::MockObject->new;
-
-$logger->set_true($_) for qw(info debug warn);
-
 my $c = Hash::AsObject->new({
-    logger => $logger,
+    logger => Log::Dispatch::Config->instance,
     tarball => "foo.tar.gz",
     dest    => "$dir",
 });
